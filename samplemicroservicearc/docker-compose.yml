@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181     
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 5s
+      timeout: 100s
+      retries: 50
+  swagger-ui-productservice:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui-productservice"
+    ports:
+      - "81:8080"
+    volumes:
+      - ./productservice/_config.yaml:/_config.yaml
+    environment:
+      SWAGGER_JSON: /_config.yaml
+  swagger-ui-orderservice:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui-orderservice"
+    ports:
+      - "80:8080"
+    volumes:
+      - ./orderservice/_config.yaml:/_config.yaml
+    environment:
+      SWAGGER_JSON: /_config.yaml
+  product-service:
+    container_name: productservice
+    image: productservice
+    ports:
+      - "8080:8080"
+  order-service:
+    container_name: orderservice
+    image: orderservice
+    ports:
+      - "8081:8081"

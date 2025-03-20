@@ -6,6 +6,8 @@ import path  from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+import  produceOrder  from './producers/producer.js';
+
 
 const app = express();
 const PORT = 8080;
@@ -21,5 +23,6 @@ app.use(bodyParser.json());
 app.use('/api/v1/products', productRoutes);
 
 app.listen(PORT, () => {
+    produceOrder();
     console.log(`Product microservice running on http://localhost:${PORT}/api/v1`);
 });

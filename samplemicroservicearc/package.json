@@ -1,0 +1,20 @@
+{
+    "name": "my-project",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+      "packages/*"
+    ],
+    "scripts": {
+      "build:orderservice": "cd orderservice && docker build -f DockerFile.dev -t orderservice:latest .",
+      "build:productservice": "cd productservice && docker build -f DockerFile.dev -t productservice:latest .",
+      "swagger:orderservice": "docker run -p 80:8080 -e SWAGGER_JSON=/tmp/swagger.yaml -v `pwd`/src/app/swagger:/tmp swaggerapi/swagger-ui",
+      "build": "npm run build:orderservice && npm run build:productservice",
+      "start": "docker compose -f docker-compose.yml up",
+      "stop": "docker compose -f docker-compose.yml stop"
+    },
+    "dependencies": {
+      "express": "^4.18.2"
+    }
+  }
+  
